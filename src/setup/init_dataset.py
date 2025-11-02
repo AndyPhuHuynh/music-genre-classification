@@ -35,6 +35,6 @@ def ensure_gtzan_downloaded() -> bool:
         return True
     except Exception as e:
         print(f"Failed to download GTZAN dataset: {e}")
-        print("Please download it manually from Kaggle and upzip the contents into \"data/GTZAN\":")
+        print("Please download it manually from Kaggle and unzip the contents into \"data/GTZAN\":")
         print("  https://www.kaggle.com/datasets/carlthome/gtzan-genre-collection")
         return False

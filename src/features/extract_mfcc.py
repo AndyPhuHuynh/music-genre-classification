@@ -2,6 +2,7 @@ import os
 import random
 import librosa
 import numpy as np
+from sklearn.preprocessing import StandardScaler
 
 from src.dataset import Dataset
 from src.paths import GTZAN_DIR
@@ -10,11 +11,20 @@ from src.features.labels import get_label
 SAMPLE_RATE = 22050
 N_MFCC = 13
 
-def extract_features(dataset_path: str = GTZAN_DIR) -> Dataset:
+
+def extract_single_feature(file_path: str, scaler: StandardScaler):
+    signal, sr = librosa.load(file_path, sr=SAMPLE_RATE)
+    mfcc = librosa.feature.mfcc(y=signal, sr=sr, n_mfcc=N_MFCC)
+    mfcc_mean = np.mean(mfcc.T, axis=0)
+    mfcc_scaled = scaler.transform(mfcc_mean.reshape(1, -1))
+    return mfcc_scaled
+
+
+def extract_features(dataset_path: str = GTZAN_DIR) -> tuple[StandardScaler, Dataset]:
     """
     Extracts MFCC features and genre labels from the GTZAN dataset
     :param dataset_path: path to the GTZAN dataset which directly contains subdirectories of all the genres
-    :return: A dataset containing MFCC features and genre labels
+    :return: (StandardScaler, Dataset) A dataset containing MFCC features and genre labels along with its scaler
     """
     X = []
     y = []
@@ -41,8 +51,12 @@ def extract_features(dataset_path: str = GTZAN_DIR) -> Dataset:
                 print(f"Unable to process file '{file_path}': {e}")
     X = np.array(X)
     y = np.array(y)
+
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X)
+
     print(f"Extracted {len(X)} samples with {X.shape[1]} features each")
-    return Dataset(X, y)
+    return scaler, Dataset(X, y)
 
 
 def split_dataset(dataset: Dataset) -> tuple[Dataset, Dataset, Dataset]:
