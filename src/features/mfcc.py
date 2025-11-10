@@ -3,11 +3,11 @@ import random
 import librosa
 import numpy as np
 from sklearn.preprocessing import StandardScaler
+from tqdm import tqdm
 
 from src.dataset import Dataset
 from src.paths import SAMPLES_DIR, DATA_DIR
 from src.features.labels import get_label_from_effect
-
 
 def extract_mfcc(file_path: str, sample_rate: int, n_mfcc: int = 13):
     try:
@@ -32,8 +32,7 @@ def extract_mfcc_from_dataset(sample_rate: int, n_mfcc: int = 13) -> tuple[Stand
         if not os.path.isdir(effect_dir):
             continue
 
-        print(f"Extracting MFCC for {effect}")
-        for filename in os.listdir(effect_dir):
+        for filename in tqdm(os.listdir(effect_dir), desc=f"Extracting MFCC for {effect:<5}"):
             file_path = os.path.join(effect_dir, filename)
             try:
                 signal, sr = librosa.load(file_path, sr=sample_rate)
