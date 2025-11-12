@@ -128,7 +128,7 @@ def generate_melody_for_chord(chord, scale, start_time, track, channel, volume, 
 
 
 def get_neighbor_in_scale(note: music21.note.Note, scale: music21.scale.ConcreteScale, direction: str) -> music21.note.Note:
-    pitches = scale.getPitches(music21.pitch.Pitch("C0"), music21.pitch.Pitch("C8"))
+    pitches = scale.getPitches(minPitch=music21.pitch.Pitch("C0"), maxPitch=music21.pitch.Pitch("C8"))
     if direction == "up":
         for p in pitches:
             if p.midi > note.pitch.midi:
@@ -141,7 +141,7 @@ def get_neighbor_in_scale(note: music21.note.Note, scale: music21.scale.Concrete
 
 
 def leap_from_note(note: music21.note.Note, scale: music21.scale.ConcreteScale, direction: str, leap_count: int):
-    pitches = scale.getPitches(music21.pitch.Pitch("C0"), music21.pitch.Pitch("C8"))
+    pitches = scale.getPitches(minPitch=music21.pitch.Pitch("C0"), maxPitch=music21.pitch.Pitch("C8"))
     leaps = 0
     if direction == "up":
         for p in pitches:

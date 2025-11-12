@@ -1,7 +1,15 @@
 from pathlib import Path
 
 PROJECT_DIR: Path = Path(__file__).resolve().parent.parent
-DATA_DIR:    Path = PROJECT_DIR.joinpath("data")
-SAMPLES_DIR: Path = PROJECT_DIR.joinpath("samples")
-HAPPY_DIR:   Path = DATA_DIR.joinpath("happy")
-SAD_DIR:     Path = DATA_DIR.joinpath("sad")
+
+DATA_DIR:       Path = PROJECT_DIR / "data"
+SAMPLES_DIR:    Path = PROJECT_DIR / "samples"
+SOUNDFONTS_DIR: Path = PROJECT_DIR / "soundfonts"
+TEMP_DIR:       Path = PROJECT_DIR / "temp"
+
+# SOUNDFONTS
+FLUID_SF_NAME: str = "FluidR3_GM"
+FLUID_SF_PATH: Path = SOUNDFONTS_DIR / f"{FLUID_SF_NAME}.sf2"
+
+# DATA
+DIATONIC_DIR: Path = DATA_DIR / "diatonic"

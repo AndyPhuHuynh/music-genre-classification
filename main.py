@@ -2,60 +2,46 @@ import os
 os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 os.environ["TF_CPP_MIN_LOG_LEVEL"]  = "2"
 
-from src.dataset.generate_dataset import SAMPLE_RATE
-from src.features.labels import get_effect_from_label
-from src.features.mfcc import extract_mfcc_from_dataset
-from src.models.model1 import train_model1
+import subprocess
 from tqdm import tqdm
 
-from src.music_generation.generate_music import *
-from src.paths import HAPPY_DIR, SAD_DIR
-from pathlib import Path
-import subprocess
+import src.paths as paths
+from src.setup.soundfonts import download_soundfonts
+from src.music_generation.generate_music import Song
 
-sf2_path = Path("./soundfonts/FluidR3_GM.sf2").resolve()
+# from src.features.labels import get_effect_from_label
+# from src.features.mfcc import extract_mfcc_from_dataset
+# from src.models.model1 import train_model1
+#
+# from src.music_generation.generate_music import *
 
 NUM_SONGS: int = 10
 
 def generate_songs():
-    os.makedirs(HAPPY_DIR, exist_ok=True)
-    os.makedirs(SAD_DIR, exist_ok=True)
+    os.makedirs(paths.DIATONIC_DIR, exist_ok=True)
     for i in tqdm(range(NUM_SONGS), desc="Generating songs"):
-        happy_mid = HAPPY_DIR/f"happy_{i:03}.mid"
-        happy_wav = HAPPY_DIR/f"happy_{i:03}.wav"
-        sad_mid = SAD_DIR/f"sad_{i:03}.mid"
-        sad_wav = SAD_DIR/f"sad_{i:03}.wav"
+        midi = paths.DIATONIC_DIR/f"diatonic_{i:03}.mid"
+        wave = paths.DIATONIC_DIR/f"diatonic_{i:03}.wav"
 
         happy_song = Song()
-        happy_song.write(happy_mid)
+        happy_song.write(midi)
         subprocess.run([
-            "fluidsynth",
-            "-ni",
-            "-F", happy_wav,
+            "fluidsynth", "-ni",
+            "-F", wave,
             "-r", "44100",
-            sf2_path,
-            happy_mid
+            paths.FLUID_SF_PATH,
+            midi
         ], check=True, stdout=subprocess.DEVNULL)
-        happy_mid.unlink()
-        print(f"Progression for {happy_mid}:")
+        midi.unlink()
+        print(f"Progression for {midi}:")
         for phrase in happy_song.phrases:
             print(f"\t{phrase.progression}")
 
-        sad_song = Song()
-        sad_song.write(sad_mid)
-        subprocess.run([
-            "fluidsynth",
-            "-ni",
-            "-F", sad_wav,
-            "-r", "44100",
-            sf2_path,
-            sad_mid
-        ], check=True, stdout=subprocess.DEVNULL)
-        sad_mid.unlink()
 
+download_soundfonts()
 generate_songs()
 # scaler, dataset = extract_mfcc_from_dataset(SAMPLE_RATE)
-#
+
 # model, history, ratios = train_model1(dataset)
 # for effect, accuracy in ratios.items():
 #     print(f"Accuracy for {get_effect_from_label(effect):<10} is {100 * accuracy:.2f}%")
